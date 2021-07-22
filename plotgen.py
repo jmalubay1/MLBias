@@ -37,7 +37,7 @@ class Window:
         )
         self.gen_button.grid(row=0, column=2)
 
-        self.fig = Figure(figsize=(10, 5), dpi=100)
+        self.fig = Figure(figsize=(15, 5), dpi=100)
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
         self.canvas.get_tk_widget().grid(row=1, column=0, columnspan=3)
 
