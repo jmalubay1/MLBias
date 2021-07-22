@@ -2,7 +2,8 @@ import tkinter
 import os
 import pandas as pd
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
+import seaborn.apionly as sns
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -36,7 +37,7 @@ class Window:
         )
         self.gen_button.grid(row=0, column=2)
 
-        self.fig = Figure(figsize=(10, 5), dpi=100)
+        self.fig = Figure(figsize=(15, 5), dpi=100)
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
         self.canvas.get_tk_widget().grid(row=1, column=0, columnspan=3)
 
@@ -52,11 +53,17 @@ class Window:
     def _fig_gen(self):
         x_var, y_var = self.var1_select.get(), self.var2_select.get()
         if x_var in self.records.columns and y_var in self.records.columns:
+            count = self.records.groupby([x_var,y_var]).size()
+            count = pd.DataFrame(count.reset_index())
+            count.columns = [x_var,y_var,'total']
+            count = count.pivot(index=y_var, columns=x_var, values='total')
+            count = count.iloc[::-1]
+            print(count)
             self.fig.clf()
-            plot1 = self.fig.add_subplot(111)
-            plot1.scatter(self.records[x_var].tolist(), self.records[y_var].tolist())
+            sns.heatmap(count, cmap='Oranges', annot=True, fmt='g', ax=self.fig.subplots())
             self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
             self.canvas.draw()
+
             self.canvas.get_tk_widget().grid(row=1, column=0, columnspan=3)
 
 
