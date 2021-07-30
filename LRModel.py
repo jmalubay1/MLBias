@@ -51,6 +51,22 @@ class Model:
         onehotlabels = enc.transform(X_2).toarray()
         print(type(onehotlabels))
         print("Hot label dimensions:", onehotlabels.shape)
+
+        labelsdf = pd.DataFrame(onehotlabels)
+
+        # concatenate 1hot encoded dataframe (x) with original dataframe(that now has dropped the redudant columns)
+        print(type(self.data), type(labelsdf))
+        # frames = [self.data, labelsdf]
+        # result = pd.concat(frames)
+        result = pd.concat([self.data, labelsdf], axis=1)
+        print("Shape:", result.shape)
+        print(result.head(2))
+
+        result = result.dropna()
+        y = pd.DataFrame(result, columns=['decile_score'])
+        result = result.drop(['decile_score'], 1)
+        print(result.shape)
+
         # print(onehotlabels.shape)
         # print(onehotlabels)
         # Normal linear regression model
