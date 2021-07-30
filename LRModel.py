@@ -15,19 +15,27 @@ class Model:
         self.data = data
 
     def convert_data(self):
+        # drop unwanted dataframes (like redudant ones such as dates)
+        # y = self.data['decile_score']
+
+        self.data = self.data[['sex', 'age', 'race', 'juv_fel_count',
+                               'juv_misd_count', 'juv_other_count', 'priors_count',
+                               'days_b_screening_arrest', 'c_days_from_compas',
+                               'c_charge_degree', 'is_recid', 'r_charge_degree', 'decile_score']]
+
+
         # for column in self.data:
         #     print(self.data[column])
         pd.set_option('display.max_rows', None, 'display.max_columns', None)
         print("Original number of columns:", len(self.data.columns))
 
-        print("Dropping out column \'id'\'")
-        self.data = self.data.drop(['id'], 1)
+        # print("Dropping out column \'id'\'")
+        # self.data = self.data.drop(['id'], 1)
 
-        y = self.data['decile_score']
 
-        print("Dropping out column \'decile_score'\'")
-        self.data = self.data.drop(['decile_score'], 1)
-        # print(len(self.data.columns))
+        # print("Dropping out column \'decile_score'\'")
+        # self.data = self.data.drop(['decile_score'], 1)
+        # # print(len(self.data.columns))
 
         print("Picking out non numeric columns...")
         x = self.data.select_dtypes(include=[object])
@@ -36,20 +44,22 @@ class Model:
 
         le = preprocessing.LabelEncoder()
         X_2 = x.apply(le.fit_transform)
+        print(X_2.shape)
         # print(X_2.head(2))
         enc = preprocessing.OneHotEncoder()
         enc.fit(X_2)
         onehotlabels = enc.transform(X_2).toarray()
+        print(type(onehotlabels))
         print("Hot label dimensions:", onehotlabels.shape)
         # print(onehotlabels.shape)
         # print(onehotlabels)
         # Normal linear regression model
-        self.build_model(onehotlabels, y)
+        self.build_model(result, y)
 
     def build_model(self, X, y):
         print("Spliting dataset 80/20...")
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-        print(X_test.shape, y_test.shape)
+        print(X_train.shape, X_test.shape)
         print("Training...")
         model = LinearRegression()
         model.fit(X_train, y_train)
@@ -73,4 +83,3 @@ class Model:
         # plt.yticks(())
         #
         # plt.show()
-
