@@ -1,6 +1,10 @@
 import os
+import tkinter
+
 import pandas as pd  # For reading CSV files
 import time
+from plotgen import Window
+from LRModel import Model
 
 # Path to all CSVs
 DATA_PATH = 'csv_data'
@@ -27,6 +31,10 @@ def read_records():
 
 if __name__ == "__main__":
     start = time.time()
-    read_records()
+    # root = tkinter.Tk()
+    # window = Window(root, read_records())
+    # tkinter.mainloop()
+    model = Model(read_records())
+    model.convert_data()
     elapsed = time.time() - start
     print("\n\nScript execution time: {} seconds".format(elapsed))
