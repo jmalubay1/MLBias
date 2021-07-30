@@ -42,6 +42,17 @@ class Model:
         # print(x.columns)
         print("Number of non numerical columns:", x.shape)
 
+        # go through the columns of data
+        cols = []
+        for i in range(len(self.data.columns)):
+            col = self.data.iloc[:, i]
+            # if its a categorical column drop it from data (because we're going to add the 1 hot versions above)
+            if col.dtype == 'object':
+                print(col.name)
+                cols.append(col.name)
+        self.data = self.data.drop(columns=cols, axis=1)
+        print(self.data.shape)
+
         le = preprocessing.LabelEncoder()
         X_2 = x.apply(le.fit_transform)
         print(X_2.shape)
