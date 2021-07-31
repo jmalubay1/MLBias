@@ -1,9 +1,12 @@
 import os
 import tkinter
 import numpy as np
+import random as r
 
 import pandas as pd  # For reading CSV files
 import time
+
+from pandas.core.frame import DataFrame
 from plotgen import Window
 from LRModel import Model
 
@@ -30,32 +33,90 @@ def read_records():
     return all_records
 
 
+def test_data(num_records):
+    races = ['A', 'B', 'C', 'D']
+    sexs = ['F','M']
+
+    dtypes = np.dtype(
+        [
+            ("sex", str),
+            ("age", int),
+            ("race", str),
+            ("juv_fel_count", int),
+            ("juv_misd_count", int),
+            ("juv_other_count", int),
+            ("priors_count", int),
+            ("days_b_screening_arrest", int),
+            ("c_days_from_compas", int),
+            ("c_charge_degree", str),
+            ("is_recid", int),
+            ("r_charge_degree", str),
+            ("decile_score", int)
+        ]
+    )
+
+    data = np.empty(0,dtype=dtypes)
+    testframe = DataFrame(data)
+    
+    for i in range(num_records):
+        race = r.choice(races)
+        age = r.randint(18,80)
+        sex = r.choice(sexs)
+        record = rand_record(sex,age,race,testframe.columns)
+        testframe = testframe.append(record, ignore_index=True)
+
+    print(testframe.shape)
+    return testframe
+
+def rand_record(sex,age,race,columns):
+    record = [sex,age,race]
+
+    #juv_fel_count
+    record.append(int(r.randint(0,3)))
+    #juv_misd_count
+    record.append(r.randint(0,3))
+    #juv_other_count
+    record.append(r.randint(0,3))
+    #priors_count
+    record.append(r.randint(0,5))
+    #days_b_screening_arrest
+    record.append(r.randint(0,10))
+    #c_days_from_compas
+    record.append(r.randint(0,4))
+    #c_charge_degree
+    record.append(r.randint(0,3))
+    #is_recid
+    record.append(r.randint(0,1))
+    #r_charge_degree
+    if record[10] == 1:
+        record.append(r.choice(['F','M']))
+    else:
+        record.append('')
+    #decile_score
+    score = 1
+    if race == 'B':
+        score += 2
+    if race == 'C':
+        score += 5
+    if race == 'D':
+        score += 8
+    record.append(score)
+
+    rec_dict = {columns[i]: record[i] for i in range(len(record))}
+    
+    return rec_dict
+        
+
+
 if __name__ == "__main__":
     start = time.time()
     # root = tkinter.Tk()
     # window = Window(root, read_records())
     # tkinter.mainloop()
 
-    df = pd.DataFrame(
-        np.random.randint(0, 100, size=(1000, 12)),
-        columns={
-            "sex",
-            "age",
-            "race",
-            "juv_fel_count",
-            "juv_misd_count",
-            "juv_other_count",
-            "priors_count",
-            "days_b_screening_arrest",
-            "c_days_from_compas",
-            "c_charge_degree",
-            "is_recid",
-            "r_charge_degree",
-        },
-    )
-    y = pd.DataFrame(np.random.randint(0, 10, size=(1000, 1)), columns={"decile_score"})
-    model = Model(df)
-    model.build_model(df, y)
+    # Random Dataframe
+    model = Model(test_data(1000))
+    model.convert_data()
 
     # model = Model(read_records())
     # model.convert_data()
