@@ -18,20 +18,33 @@ class Model:
         # drop unwanted dataframes (like redudant ones such as dates)
         # y = self.data['decile_score']
 
-        self.data = self.data[['sex', 'age', 'race', 'juv_fel_count',
-                               'juv_misd_count', 'juv_other_count', 'priors_count',
-                               'days_b_screening_arrest', 'c_days_from_compas',
-                               'c_charge_degree', 'is_recid', 'r_charge_degree', 'decile_score']]
+        print(type(self.data))
 
+        self.data = self.data[
+            [
+                "sex",
+                "age",
+                "race",
+                "juv_fel_count",
+                "juv_misd_count",
+                "juv_other_count",
+                "priors_count",
+                "days_b_screening_arrest",
+                "c_days_from_compas",
+                "c_charge_degree",
+                "is_recid",
+                "r_charge_degree",
+                "decile_score",
+            ]
+        ]
 
         # for column in self.data:
         #     print(self.data[column])
-        pd.set_option('display.max_rows', None, 'display.max_columns', None)
+        pd.set_option("display.max_rows", None, "display.max_columns", None)
         print("Original number of columns:", len(self.data.columns))
 
         # print("Dropping out column \'id'\'")
         # self.data = self.data.drop(['id'], 1)
-
 
         # print("Dropping out column \'decile_score'\'")
         # self.data = self.data.drop(['decile_score'], 1)
@@ -47,7 +60,7 @@ class Model:
         for i in range(len(self.data.columns)):
             col = self.data.iloc[:, i]
             # if its a categorical column drop it from data (because we're going to add the 1 hot versions above)
-            if col.dtype == 'object':
+            if col.dtype == "object":
                 print(col.name)
                 cols.append(col.name)
         self.data = self.data.drop(columns=cols, axis=1)
@@ -74,8 +87,8 @@ class Model:
         print(result.head(2))
 
         result = result.dropna()
-        y = pd.DataFrame(result, columns=['decile_score'])
-        result = result.drop(['decile_score'], 1)
+        y = pd.DataFrame(result, columns=["decile_score"])
+        result = result.drop(["decile_score"], 1)
         print(result.shape)
 
         # print(onehotlabels.shape)
@@ -85,7 +98,9 @@ class Model:
 
     def build_model(self, X, y):
         print("Spliting dataset 80/20...")
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=0
+        )
         print(X_train.shape, X_test.shape)
         print("Training...")
         model = LinearRegression()
@@ -96,11 +111,11 @@ class Model:
         print(model.score(X_test, y_test))
 
         # The coefficients
-        print('Coefficients: \n', model.coef_)
+        print("Coefficients: \n", model.coef_)
         # The mean squared error
-        print('Mean squared error: %.2f' % mean_squared_error(y_test, y_pred))
+        print("Mean squared error: %.2f" % mean_squared_error(y_test, y_pred))
         # The coefficient of determination: 1 is perfect prediction
-        print('Coefficient of determination: %.2f' % r2_score(y_test, y_pred))
+        print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred))
 
         # print("Plotting result...")
         # plt.scatter(X_test, y_test, color='black')
