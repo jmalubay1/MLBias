@@ -65,7 +65,7 @@ def test_data(num_records):
         record = rand_record(sex,age,race,testframe.columns)
         testframe = testframe.append(record, ignore_index=True)
 
-    print(testframe.shape)
+    #print(testframe.shape)
     return testframe
 
 def rand_record(sex,age,race,columns):
@@ -105,7 +105,6 @@ def rand_record(sex,age,race,columns):
     rec_dict = {columns[i]: record[i] for i in range(len(record))}
     
     return rec_dict
-        
 
 
 if __name__ == "__main__":
@@ -115,10 +114,17 @@ if __name__ == "__main__":
     # tkinter.mainloop()
 
     # Random Dataframe
-    model = Model(test_data(1000))
-    model.convert_data()
+    # rand_model = Model(test_data(1000))
+    # rand_model.convert_data()
 
-    # model = Model(read_records())
-    # model.convert_data()
+    print('----------------')
+
+    compas_model = Model(read_records())
+    X_test, y_test = compas_model.convert_data()
+
+    # control for attribute (currently hardcoded to race) and compare scores
+    for i in range(10):
+        compas_model.score_attribute(X_test.iloc[[i]], y_test.iat[i, 0]) # input shape is a single df row and the recidivism score
+
     elapsed = time.time() - start
     print("\n\nScript execution time: {} seconds".format(elapsed))
