@@ -1,6 +1,9 @@
 # MLBias
 Machine Learning Bias project for Data exploration
 
+Project presentation
+https://docs.google.com/presentation/d/1GeEUbS7JAYbkb43BDaxqC_CCgXb6GvhBkEHHdzAyv0w/edit?usp=sharing
+
 Project Plan
 John Strenio, Jordan Malubay, Yufei Tao
 
