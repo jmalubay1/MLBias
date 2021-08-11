@@ -66,7 +66,7 @@ class Window:
             ax.set_xlabel(x_var)
             ax.set_ylabel(y_var)
             ax.scatter(x=count[x_var],y=count[y_var],s=count['total']*scale, c=count['total'])
-            ax.margins(x=None,y=1)
+            ax.margins(x=1,y=None)
             self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
             self.canvas.draw()
 
