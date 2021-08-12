@@ -51,20 +51,6 @@ class Model:
         # print("Dropping out column \'decile_score'\'")
         # self.data = self.data.drop(['decile_score'], 1)
         # # print(len(self.data.columns))
-        aa_count = 0
-        cc_count = 0
-        for i in range(len(self.data)):
-            if self.data['race'][i] == 'African-American' and aa_count < 2400:
-                aa_count += 1
-            elif self.data['race'][i] == 'Caucasian' and cc_count < 2400:
-                cc_count += 1
-            else:
-                self.data = self.data.drop(index=i)
-        
-        print("COUNTS:")
-        print(aa_count)
-        print(cc_count)
-        print(len(self.data))
 
         #print("Picking out non numeric columns...")
         x = self.data.select_dtypes(include=[object])
@@ -162,16 +148,8 @@ class Model:
             preds.append(pred)
 
         print("Val MSE: %.2f" % mean_squared_error(y_test, preds))
-        # print("Model train score:", self.model.score(X_train, y_train))
-        # print("Model test score:", self.model.score(X_test, y_test))
-        # # The mean squared error
-        # print("MSE Train: %.2f" % mean_squared_error(y_train, x_pred))
-        # print("MSE Test: %.2f" % mean_squared_error(y_test, y_pred))
-        # # The coefficient of determination: 1 is perfect prediction
-        # print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred))
-        # print()
 
-        return X_test, y_test#, history
+        return X_test, y_test, history
 
     def build_model(self, X, y):
         print("Spliting dataset 80/20...")
@@ -197,14 +175,6 @@ class Model:
         print()
 
         return X_test, y_test
-        # print("Plotting result...")
-        # plt.scatter(X_test, y_test, color='black')
-        # plt.plot(X_test, y_pred, color='blue', linewidth=3)
-        #
-        # plt.xticks(())
-        # plt.yticks(())
-        #
-        # plt.show()
  
     def score_attribute(self, sample, d_score): # should be same input shape as model e.g. X_test
         sample = numpy.asarray(sample)[0]
