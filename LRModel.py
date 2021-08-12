@@ -18,7 +18,7 @@ class Model:
     def __init__(self, data):
         self.data = data
 
-    def convert_data(self):
+    def convert_data(self, model_type):
         # drop unwanted dataframes (like redudant ones such as dates)
         # y = self.data['decile_score']
 
@@ -98,8 +98,10 @@ class Model:
         # Normal linear regression model
 
         # returns build_model's return values (X_test, y_test) for further testing
-        #return self.build_nonlin_model(result, y)
-        return self.build_model(result, y)
+        if model_type == 'linear':
+            return self.build_model(result, y)
+        else:
+            return self.build_nonlin_model(result, y)
 
     def build_nonlin_model(self, X, y):
         print("Spliting dataset 80/20...")
@@ -174,7 +176,7 @@ class Model:
         #print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred))
         print()
 
-        return X_test, y_test
+        return X_test, y_test, 1
  
     def score_attribute(self, sample, d_score): # should be same input shape as model e.g. X_test
         sample = numpy.asarray(sample)[0]
