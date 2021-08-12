@@ -51,6 +51,20 @@ class Model:
         # print("Dropping out column \'decile_score'\'")
         # self.data = self.data.drop(['decile_score'], 1)
         # # print(len(self.data.columns))
+        aa_count = 0
+        cc_count = 0
+        for i in range(len(self.data)):
+            if self.data['race'][i] == 'African-American' and aa_count < 2400:
+                aa_count += 1
+            elif self.data['race'][i] == 'Caucasian' and cc_count < 2400:
+                cc_count += 1
+            else:
+                self.data = self.data.drop(index=i)
+        
+        print("COUNTS:")
+        print(aa_count)
+        print(cc_count)
+        print(len(self.data))
 
         #print("Picking out non numeric columns...")
         x = self.data.select_dtypes(include=[object])
@@ -98,7 +112,8 @@ class Model:
         # Normal linear regression model
 
         # returns build_model's return values (X_test, y_test) for further testing
-        return self.build_nonlin_model(result, y)
+        #return self.build_nonlin_model(result, y)
+        return self.build_model(result, y)
 
     def build_nonlin_model(self, X, y):
         print("Spliting dataset 80/20...")
@@ -108,12 +123,12 @@ class Model:
         print(X_train.shape, X_test.shape)
         print("Training...")
 
-        # hyperparameters
-        lr = 0.001
-        n_epochs = 100 
+        # hyperparameters lr=.001,ep=100,b=10 | lr=.0001,ep=1000,b=1 | 
+        lr = 0.001   # original 0.001
+        n_epochs = 20 # 100
         n_att = X_train.shape[1]
         print("n_attributes (model input size): " + str(n_att))
-        n_batch = n_att * 10
+        n_batch = n_att * 10 # 10
 
         # define model 
         self.model = models.Sequential()
@@ -126,7 +141,7 @@ class Model:
         self.model.compile(loss='mse', optimizer=opt, metrics=['mse', 'mae'])
 
         # train model
-        history = self.model.fit(X_train, y, epochs=n_epochs, batch_size=n_batch, verbose=2, validation_split=0.2)
+        history = self.model.fit(X_train, y, epochs=n_epochs, batch_size=n_batch, verbose=0, validation_split=0.2)
 
         # validate model
         preds = []
@@ -136,7 +151,7 @@ class Model:
 
             # convert to np array and add batch dimension for model input
             input_sample = numpy.asarray(input_sample)
-            input_sample = numpy.expand_dims(input_sample, axis=0)
+            #input_sample = numpy.expand_dims(input_sample, axis=0) # wasn't working with just expand dims
             #input_sample = numpy.squeeze(input_sample, axis=1)
             if i == 1:
                 print('val sample shape:')
@@ -147,7 +162,6 @@ class Model:
             preds.append(pred)
 
         print("Val MSE: %.2f" % mean_squared_error(y_test, preds))
-        print("Val R2 score:", r2_score(y_test, preds))
         # print("Model train score:", self.model.score(X_train, y_train))
         # print("Model test score:", self.model.score(X_test, y_test))
         # # The mean squared error
@@ -157,7 +171,7 @@ class Model:
         # print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred))
         # print()
 
-        return X_test, y_test
+        return X_test, y_test#, history
 
     def build_model(self, X, y):
         print("Spliting dataset 80/20...")
@@ -170,8 +184,8 @@ class Model:
         self.model.fit(X_train, y_train)
         y_pred = self.model.predict(X_test)
         x_pred = self.model.predict(X_train)
-        print("Model train score:", self.model.score(X_train, y_train))
-        print("Model test score:", self.model.score(X_test, y_test))
+        print("Model train R2 score:", self.model.score(X_train, y_train))
+        print("Model test R2 score:", self.model.score(X_test, y_test))
 
         # The coefficients
         #print("Coefficients: \n", model.coef_)
@@ -179,7 +193,7 @@ class Model:
         print("MSE Train: %.2f" % mean_squared_error(y_train, x_pred))
         print("MSE Test: %.2f" % mean_squared_error(y_test, y_pred))
         # The coefficient of determination: 1 is perfect prediction
-        print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred))
+        #print("Coefficient of determination: %.2f" % r2_score(y_test, y_pred))
         print()
 
         return X_test, y_test
@@ -192,11 +206,11 @@ class Model:
         #
         # plt.show()
  
-    # TODO: generalize this to be able to work with any attribute
     def score_attribute(self, sample, d_score): # should be same input shape as model e.g. X_test
         sample = numpy.asarray(sample)[0]
         #print('sample dims: ' + str(sample.shape))
-
+        # this label order before 1 hot encoding
+        race = ['African-American', 'Hispanic', 'Caucasian', 'Other']
         print("compas score: " + str(d_score))
 
         race_scores = []
@@ -205,12 +219,13 @@ class Model:
             # zero race 1-hot
             for j in range(10, 14, 1):
                 sample[j] = 0
-            sample[i] = 1
+            # 1-hot encode each race
+            sample[10+i] = 1
             model_input_sample = numpy.expand_dims(sample, axis=0)
             #model_input_sample = numpy.squeeze(model_input_sample)
             #print('new dims: ' + str(model_input_sample.shape))
-            race_scores.append(self.model.predict(model_input_sample)[0][0])
-            print('race ' + str(i) + ' score: ' + str(race_scores[i]))
+            race_scores.append(round(self.model.predict(model_input_sample)[0][0], 2))
+            print(race[i] + ' score: ' + str(race_scores[i]))
         print('---------------------------')
 
         return race_scores 
